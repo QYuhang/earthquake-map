@@ -95,3 +95,26 @@ else:
 # 原始数据表
 with st.expander("📂 查看详细数据报表"):
     st.dataframe(filtered_df[['time', 'place', 'mag', 'lat', 'lon']])
+
+# --- [V1.1 新增功能] 统计分析层 ---
+st.markdown("---") # 分割线
+st.subheader("📊 地震时间分布分析")
+
+# 1. 数据预处理：将时间列转换为 datetime 对象，方便统计
+# 我们的 raw data 里 'time' 是字符串，需要转一下
+if not filtered_df.empty:
+    filtered_df['datetime'] = pd.to_datetime(filtered_df['time'])
+    
+    # 2. 按“小时”进行分组统计
+    # 提取小时数 (0-23)
+    filtered_df['hour'] = filtered_df['datetime'].dt.hour
+    
+    # 统计每个小时出现的次数
+    hourly_counts = filtered_df['hour'].value_counts().sort_index()
+    
+    # 3. 渲染柱状图 (Bar Chart)
+    st.bar_chart(hourly_counts)
+    
+    st.caption("X轴：一天中的24小时 (0-23) | Y轴：地震发生次数")
+else:
+    st.info("暂无数据可供统计")
